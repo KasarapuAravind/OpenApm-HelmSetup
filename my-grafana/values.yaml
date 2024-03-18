@@ -1,0 +1,66 @@
+# https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
+
+# If `commonAnnotations` is set outside of this file then you must also set all other values which reference the `*commonAnnotations` anchor
+commonAnnotations: &commonAnnotations
+  owner: aravind.smsk@gmail.com
+  product: grafana
+
+# Global vars for all environments
+
+grafana:
+
+  podDisruptionBudget:
+    maxUnavailable: 1
+
+  # Ensure we have our required annotations
+  podAnnotations: *commonAnnotations
+
+  service:
+    annotations: *commonAnnotations
+
+    # Setting the port is required because it is used in the ingress to determine what port
+    # to forward incoming traffic to
+    port: 3000
+
+  serviceMonitor:
+    enabled: true
+
+  resources:
+    limits:
+      cpu: 100m
+      memory: 200Mi
+    requests:
+      cpu: 100m
+      memory: 200Mi
+
+  # TODO: Temporary, hard-code admin to match kube-prometheus-stack values
+  adminUser: admin
+  adminPassword: prom-operator
+
+
+  # This is the automatic discovery process based on K8s watchers
+  sidecar:
+    resources:
+      limits:
+        cpu: 100m
+        memory: 200Mi
+      requests:
+        cpu: 50m
+        memory: 100Mi
+
+
+    # These are the resources that are watched for dynamic updates
+    dashboards:
+      enabled: true
+      searchNamespace: ALL
+
+      # These allow dashboards to define which folder they should be placed in
+      folderAnnotation: grafana_folder
+      provider:
+        allowUiUpdates: true
+        foldersFromFilesStructure: true
+
+    datasources:
+      enabled: true
+      label: grafana_datasource
+      searchNamespace: ALL
