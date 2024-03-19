@@ -1,0 +1,231 @@
+# https://github.com/grafana/mimir/blob/main/operations/helm/charts/mimir-distributed/values.yaml
+# CHANGELOG for Mimir releases: https://github.com/grafana/mimir/blob/main/operations/helm/charts/mimir-distributed/CHANGELOG.md
+
+# Global vars for all environments
+
+commonAnnotations: &commonAnnotations
+  owner: aravind
+  product: aravind.smsk@gmail.com
+
+mimir-distributed:
+
+  global:
+    # Ensure we have our required annotations
+    podAnnotations: *commonAnnotations
+
+  metaMonitoring:
+    dashboards:
+      enabled: true
+      annotations:
+        grafana_folder: "APM Tools"
+
+    serviceMonitor:
+      enabled: true
+    prometheusRule:
+      enabled: true
+      mimirAlerts: true
+
+  # We are using S3
+  minio:
+    enabled: false
+
+
+  # Allows overriding Mimir configuration values
+  structuredConfig:
+    limits:
+      # Want to enable exemplars
+      max_global_exemplars_per_user: 100000
+
+
+  # Below are settings for the various services
+
+  alertmanager:
+    persistentVolume:
+      enabled: false
+    service:
+      annotations: *commonAnnotations
+    livenessProbe:
+      httpGet:
+        path: /ready
+        port: http-metrics
+      failureThreshold: 3
+      initialDelaySeconds: 100
+      periodSeconds: 5
+
+
+  compactor:
+    persistentVolume:
+      enabled: false
+    service:
+      annotations: *commonAnnotations
+    livenessProbe:
+      httpGet:
+        path: /ready
+        port: http-metrics
+      failureThreshold: 3
+      initialDelaySeconds: 100
+      periodSeconds: 5
+
+  distributor:
+    service:
+      annotations: *commonAnnotations
+    livenessProbe:
+      httpGet:
+        path: /ready
+        port: http-metrics
+      failureThreshold: 3
+      initialDelaySeconds: 100
+      periodSeconds: 5
+
+
+  ingester:
+    service:
+      annotations: *commonAnnotations
+    livenessProbe:
+      httpGet:
+        path: /ready
+        port: http-metrics
+      failureThreshold: 3
+      initialDelaySeconds: 100
+      periodSeconds: 5
+
+    replicas: 3   # Request at least 1 per AZ
+    persistentVolume:
+      enabled: false
+    topologySpreadConstraints: {}
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: target # support for enterprise.legacyLabels
+                  operator: In
+                  values:
+                    - ingester
+            topologyKey: 'kubernetes.io/hostname'
+
+          - labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - ingester
+            topologyKey: 'kubernetes.io/hostname'
+    zoneAwareReplication:
+      topologyKey: 'kubernetes.io/hostname'
+
+  # TODO: Should be using a gateway section anyway.  Revisit
+  nginx:
+    enabled: false
+    service:
+      annotations: *commonAnnotations
+    livenessProbe:
+      httpGet:
+        path: /
+        port: http-metric
+      failureThreshold: 3
+      initialDelaySeconds: 100
+      periodSeconds: 5
+
+  overrides_exporter:
+    enabled: false
+    service:
+      annotations: *commonAnnotations
+    livenessProbe:
+      httpGet:
+        path: /
+        port: http-metric
+      failureThreshold: 3
+      initialDelaySeconds: 100
+      periodSeconds: 5
+
+  querier:
+    replicas: 1
+    service:
+      annotations: *commonAnnotations
+    livenessProbe:
+      httpGet:
+        path: /ready
+        port: http-metrics
+      failureThreshold: 3
+      initialDelaySeconds: 100
+      periodSeconds: 5
+
+  query_frontend:
+    service:
+      annotations: *commonAnnotations
+    livenessProbe:
+      httpGet:
+        path: /ready
+        port: http-metrics
+      failureThreshold: 3
+      initialDelaySeconds: 100
+      periodSeconds: 5
+
+
+  query_scheduler:
+    replicas: 1
+    service:
+      annotations: *commonAnnotations
+    livenessProbe:
+      httpGet:
+        path: /ready
+        port: http-metrics
+      failureThreshold: 3
+      initialDelaySeconds: 100
+      periodSeconds: 5
+
+
+  # This is not deploying correct - if we want to use it, will
+  # have to make further updates
+  rollout_operator:
+    enabled: false
+
+  ruler:
+    service:
+      annotations: *commonAnnotations
+    livenessProbe:
+      httpGet:
+        path: /ready
+        port: http-metrics
+      failureThreshold: 3
+      initialDelaySeconds: 100
+      periodSeconds: 5
+
+
+  store_gateway:
+    service:
+      annotations: *commonAnnotations
+    livenessProbe:
+      httpGet:
+        path: /ready
+        port: http-metrics
+      failureThreshold: 3
+      initialDelaySeconds: 100
+      periodSeconds: 5
+
+    replicas: 1
+    persistentVolume:
+      enabled: false
+      size: 5Gi
+    topologySpreadConstraints: {}
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: target # support for enterprise.legacyLabels
+                  operator: In
+                  values:
+                    - store-gateway
+            topologyKey: 'kubernetes.io/hostname'
+
+          - labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                    - store-gateway
+            topologyKey: 'kubernetes.io/hostname'
+    zoneAwareReplication:
+      topologyKey: 'kubernetes.io/hostname'
