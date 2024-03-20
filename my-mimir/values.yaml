@@ -5,10 +5,10 @@
 
 commonAnnotations: &commonAnnotations
   owner: aravind
-  product: aravind.smsk@gmail.com
+  product: aravind
+
 
 mimir-distributed:
-
   global:
     # Ensure we have our required annotations
     podAnnotations: *commonAnnotations
@@ -44,13 +44,6 @@ mimir-distributed:
       enabled: false
     service:
       annotations: *commonAnnotations
-    livenessProbe:
-      httpGet:
-        path: /ready
-        port: http-metrics
-      failureThreshold: 3
-      initialDelaySeconds: 100
-      periodSeconds: 5
 
 
   compactor:
@@ -58,122 +51,50 @@ mimir-distributed:
       enabled: false
     service:
       annotations: *commonAnnotations
-    livenessProbe:
-      httpGet:
-        path: /ready
-        port: http-metrics
-      failureThreshold: 3
-      initialDelaySeconds: 100
-      periodSeconds: 5
+
+  
 
   distributor:
     service:
       annotations: *commonAnnotations
-    livenessProbe:
-      httpGet:
-        path: /ready
-        port: http-metrics
-      failureThreshold: 3
-      initialDelaySeconds: 100
-      periodSeconds: 5
+
+
 
 
   ingester:
     service:
       annotations: *commonAnnotations
-    livenessProbe:
-      httpGet:
-        path: /ready
-        port: http-metrics
-      failureThreshold: 3
-      initialDelaySeconds: 100
-      periodSeconds: 5
 
     replicas: 3   # Request at least 1 per AZ
     persistentVolume:
       enabled: false
-    topologySpreadConstraints: {}
-    affinity:
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-                - key: target # support for enterprise.legacyLabels
-                  operator: In
-                  values:
-                    - ingester
-            topologyKey: 'kubernetes.io/hostname'
 
-          - labelSelector:
-              matchExpressions:
-                - key: app.kubernetes.io/component
-                  operator: In
-                  values:
-                    - ingester
-            topologyKey: 'kubernetes.io/hostname'
-    zoneAwareReplication:
-      topologyKey: 'kubernetes.io/hostname'
 
   # TODO: Should be using a gateway section anyway.  Revisit
   nginx:
     enabled: false
     service:
       annotations: *commonAnnotations
-    livenessProbe:
-      httpGet:
-        path: /
-        port: http-metric
-      failureThreshold: 3
-      initialDelaySeconds: 100
-      periodSeconds: 5
 
   overrides_exporter:
     enabled: false
     service:
       annotations: *commonAnnotations
-    livenessProbe:
-      httpGet:
-        path: /
-        port: http-metric
-      failureThreshold: 3
-      initialDelaySeconds: 100
-      periodSeconds: 5
 
   querier:
     replicas: 1
     service:
       annotations: *commonAnnotations
-    livenessProbe:
-      httpGet:
-        path: /ready
-        port: http-metrics
-      failureThreshold: 3
-      initialDelaySeconds: 100
-      periodSeconds: 5
+
 
   query_frontend:
     service:
       annotations: *commonAnnotations
-    livenessProbe:
-      httpGet:
-        path: /ready
-        port: http-metrics
-      failureThreshold: 3
-      initialDelaySeconds: 100
-      periodSeconds: 5
-
 
   query_scheduler:
     replicas: 1
     service:
       annotations: *commonAnnotations
-    livenessProbe:
-      httpGet:
-        path: /ready
-        port: http-metrics
-      failureThreshold: 3
-      initialDelaySeconds: 100
-      periodSeconds: 5
 
 
   # This is not deploying correct - if we want to use it, will
@@ -184,48 +105,12 @@ mimir-distributed:
   ruler:
     service:
       annotations: *commonAnnotations
-    livenessProbe:
-      httpGet:
-        path: /ready
-        port: http-metrics
-      failureThreshold: 3
-      initialDelaySeconds: 100
-      periodSeconds: 5
 
 
   store_gateway:
     service:
       annotations: *commonAnnotations
-    livenessProbe:
-      httpGet:
-        path: /ready
-        port: http-metrics
-      failureThreshold: 3
-      initialDelaySeconds: 100
-      periodSeconds: 5
-
     replicas: 1
     persistentVolume:
       enabled: false
-      size: 5Gi
-    topologySpreadConstraints: {}
-    affinity:
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-                - key: target # support for enterprise.legacyLabels
-                  operator: In
-                  values:
-                    - store-gateway
-            topologyKey: 'kubernetes.io/hostname'
-
-          - labelSelector:
-              matchExpressions:
-                - key: app.kubernetes.io/component
-                  operator: In
-                  values:
-                    - store-gateway
-            topologyKey: 'kubernetes.io/hostname'
-    zoneAwareReplication:
-      topologyKey: 'kubernetes.io/hostname'
+      size: 2Gi
