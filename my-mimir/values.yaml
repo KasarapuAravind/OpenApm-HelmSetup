@@ -25,10 +25,6 @@ mimir-distributed:
       enabled: true
       mimirAlerts: true
 
-  # We are using S3
-  minio:
-    enabled: false
-
 
   # Allows overriding Mimir configuration values
   structuredConfig:
@@ -40,15 +36,11 @@ mimir-distributed:
   # Below are settings for the various services
 
   alertmanager:
-    persistentVolume:
-      enabled: false
     service:
       annotations: *commonAnnotations
 
 
   compactor:
-    persistentVolume:
-      enabled: false
     service:
       annotations: *commonAnnotations
 
@@ -66,8 +58,6 @@ mimir-distributed:
       annotations: *commonAnnotations
 
     replicas: 3   # Request at least 1 per AZ
-    persistentVolume:
-      enabled: false
 
 
   # TODO: Should be using a gateway section anyway.  Revisit
@@ -111,6 +101,3 @@ mimir-distributed:
     service:
       annotations: *commonAnnotations
     replicas: 1
-    persistentVolume:
-      enabled: false
-      size: 2Gi

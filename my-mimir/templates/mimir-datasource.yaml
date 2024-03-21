@@ -11,7 +11,7 @@ data:
       - name: Mimir
         type: prometheus
         uid: mimir
-        url: http://mimir-app-query-frontend.mimir.svc:8080/prometheus
+        url: http://my-mimir-query-frontend.mimir.svc:8080/prometheus
         isDefault: true
         jsonData:
           # This is required due to multi-tenant support and the fact that we are not

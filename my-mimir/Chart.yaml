@@ -1,5 +1,5 @@
 apiVersion: v2
-name: mon-mimir
+name: my-mimir
 description: A Helm chart deploying Mimir
 
 # A chart can be either an 'application' or a 'library' chart.
