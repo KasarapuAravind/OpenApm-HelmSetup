@@ -1,0 +1,206 @@
+# https://github.com/grafana/helm-charts/blob/main/charts/tempo-distributed/values.yaml
+
+# Global vars for all environments
+
+commonannotations: &commonAnnotations
+  owner: aravind
+  product: tempo
+
+
+tempo-distributed:
+
+  # Disable usage reporting
+  reporting_enabled: false
+
+  # Enable Prometheus metrics
+  metaMonitoring:
+    serviceMonitor:
+      enabled: true
+
+  traces:
+    otlp:
+      grpc:
+        enabled: true
+
+  prometheusRule:
+    enabled: true
+
+  # The metrics generator will automatically calculate metrics from
+  # the distributed traces
+  #
+  # It comes at an extra data transfer and compute cost.  Incoming
+  # traces will be sent to the metrics generator in addition to
+  # the standard pathway
+  metricsGenerator:
+    enabled: true
+    annotations: *commonAnnotations
+    service:
+      annotations: *commonAnnotations
+
+    replicas: 2   # required to get PDB generation
+    config:
+      storage:
+        remote_write:
+        - url: http://mimir-nginx.mimir.svc:80/api/v1/push
+    resources:
+      limits:
+        cpu:  50m
+        memory: 100Mi
+      requests:
+        cpu:  50m
+        memory: 100Mi
+
+  compactor:
+    annotations: *commonAnnotations
+
+    service:
+      annotations: *commonAnnotations
+
+    # Only have two replicas so we can get PDBs created
+    replicas: 2
+    
+    resources:
+      limits:
+        cpu:  50m
+        memory: 100Mi
+      requests:
+        cpu:  50m
+        memory: 100Mi
+
+  distributor:
+    annotations: *commonAnnotations
+
+    service:
+      annotations: *commonAnnotations
+
+    serviceDiscovery:
+      annotations: *commonAnnotations
+
+    # Replicas doesn't impact the spec output if autoScaling is enabled,
+    # but it is required to be >1 in order for a PDB to be created
+    replicas: 2
+    autoscaling:
+      enabled: true
+      minReplicas: 1
+      maxReplicas: 3
+
+    resources:
+      limits:
+        cpu:  50m
+        memory: 100Mi
+      requests:
+        cpu:  50m
+        memory: 100Mi
+
+  gateway:
+    service:
+      annotations: *commonAnnotations
+
+
+    # Replicas doesn't impact the spec output if autoScaling is enabled,
+    # but it is required to be >1 in order for a PDB to be created
+    replicas: 2
+    autoscaling:
+      enabled: true
+      minReplicas: 1
+      maxReplicas: 3
+
+    resources:
+      limits:
+        cpu:  50m
+        memory: 100Mi
+      requests:
+        cpu:  50m
+        memory: 100Mi
+
+  ingester:
+    annotations: *commonAnnotations
+    podAnnotations: *commonAnnotations
+    service:
+      annotations: *commonAnnotations
+
+
+
+    # Replicas doesn't impact the spec output if autoScaling is enabled,
+    # but it is required to be >1 in order for a PDB to be created
+    replicas: 3
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 3
+
+    resources:
+      limits:
+        cpu:  50m
+        memory: 100Mi
+      requests:
+        cpu:  50m
+        memory: 100Mi
+
+  # TODO: Revisit.  Currently trying to grab the wrong image
+  memcached:
+    enabled: false
+    podAnnotations: *commonAnnotations
+    service:
+      annotations: *commonAnnotations
+
+    resources:
+      limits:
+        cpu:  50m
+        memory: 100Mi
+      requests:
+        cpu:  50m
+        memory: 100Mi
+
+  querier:
+    annotations: *commonAnnotations
+
+    service:
+      annotations: *commonAnnotations
+
+
+    # Replicas doesn't impact the spec output if autoScaling is enabled,
+    # but it is required to be >1 in order for a PDB to be created
+    replicas: 2
+    autoscaling:
+      enabled: true
+      minReplicas: 1
+      maxReplicas: 3
+
+    resources:
+      limits:
+        cpu:  50m
+        memory: 100Mi
+      requests:
+        cpu:  50m
+        memory: 100Mi
+
+  queryFrontend:
+    annotations: *commonAnnotations
+
+    service:
+      annotations: *commonAnnotations
+
+    serviceDiscovery:
+      annotations: *commonAnnotations
+
+
+
+    # Replicas doesn't impact the spec output if autoScaling is enabled,
+    # but it is required to be >1 in order for a PDB to be created
+    replicas: 2
+    autoscaling:
+      enabled: true
+      minReplicas: 1
+      maxReplicas: 3
+
+    resources:
+      limits:
+        cpu:  50m
+        memory: 100Mi
+      requests:
+        cpu:  50m
+        memory: 100Mi
+
+  tempo:
+    podAnnotations: *commonAnnotations
