@@ -14,8 +14,8 @@ kube-prometheus-stack:
   prometheusOperator:
     resources:
       limits:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 50m
+        memory: 100Mi
       requests:
         cpu: 15m
         memory: 110Mi
@@ -34,8 +34,8 @@ kube-prometheus-stack:
         podAnnotations: *commonAnnotations
         resources:
           limits:
-            cpu: 100m
-            memory: 200Mi
+            cpu: 50m
+            memory: 100Mi
           requests:
             cpu: 15m
             memory: 110Mi
@@ -69,8 +69,8 @@ kube-prometheus-stack:
   kube-state-metrics:
     resources:
       limits:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 50m
+        memory: 100Mi
       requests:
         cpu: 15m
         memory: 110Mi
@@ -83,11 +83,11 @@ kube-prometheus-stack:
   prometheus-node-exporter:
     resources:
       limits:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 50m
+        memory: 100Mi
       requests:
-        cpu: 15m
-        memory: 110Mi
+        cpu: 50m
+        memory: 100Mi
     podAnnotations: *commonAnnotations
     service:
       annotations: *commonAnnotations
@@ -103,11 +103,11 @@ kube-prometheus-stack:
     prometheusSpec:
       resources:
         limits:
-          cpu: 100m
-          memory: 200Mi
+          cpu: 50m
+          memory: 100Mi
         requests:
-          cpu: 100m
-          memory: 200Mi
+          cpu: 50m
+          memory: 100Mi
       additionalPrometheusSecretsAnnotations: *commonAnnotations
       podMetadata:
         annotations: *commonAnnotations

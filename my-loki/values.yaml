@@ -42,11 +42,11 @@ loki-distributed:
     enabled: true
     resources:
       limits:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 50m
+        memory: 100Mi
       requests:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 50m
+        memory: 100Mi
 
   distributor:
     # Replicas doesn't impact the spec output if autoScaling is enabled,
@@ -59,11 +59,11 @@ loki-distributed:
       maxReplicas: 3
     resources:
       limits:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 50m
+        memory: 100Mi
       requests:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 50m
+        memory: 100Mi
 
   ingester:
     # Replicas doesn't impact the spec output if autoScaling is enabled,
@@ -76,11 +76,11 @@ loki-distributed:
       maxReplicas: 3
     resources:
       limits:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 50m
+        memory: 100Mi
       requests:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 50m
+        memory: 100Mi
 
   querier:
     # Replicas doesn't impact the spec output if autoScaling is enabled,
@@ -93,11 +93,11 @@ loki-distributed:
       maxReplicas: 3
     resources:
       limits:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 50m
+        memory: 100Mi
       requests:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 50m
+        memory: 100Mi
     
     # structuredConfig:
     #   server:
@@ -119,11 +119,11 @@ loki-distributed:
       maxReplicas: 3
     resources:
       limits:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 50m
+        memory: 100Mi
       requests:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 50m
+        memory: 100Mi
 
 
 
@@ -138,11 +138,11 @@ loki-distributed:
 
     resources:
       limits:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 50m
+        memory: 100Mi
       requests:
-        cpu: 100m
-        memory: 200Mi
+        cpu: 50m
+        memory: 100Mi
 
     directories:
       fake:
