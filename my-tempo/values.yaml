@@ -25,30 +25,6 @@ tempo-distributed:
   prometheusRule:
     enabled: true
 
-  # The metrics generator will automatically calculate metrics from
-  # the distributed traces
-  #
-  # It comes at an extra data transfer and compute cost.  Incoming
-  # traces will be sent to the metrics generator in addition to
-  # the standard pathway
-  metricsGenerator:
-    enabled: true
-    annotations: *commonAnnotations
-    service:
-      annotations: *commonAnnotations
-
-    replicas: 2   # required to get PDB generation
-    config:
-      storage:
-        remote_write:
-        - url: http://mimir-nginx.mimir.svc:80/api/v1/push
-    resources:
-      limits:
-        cpu:  50m
-        memory: 100Mi
-      requests:
-        cpu:  50m
-        memory: 100Mi
 
   compactor:
     annotations: *commonAnnotations

@@ -88,17 +88,17 @@ opentelemetry-collector:
   config:
     exporters:
       otlp/tempo:
-        endpoint: "http://tempo-app-dmor-distributor.tempo.svc:4317"
+        endpoint: "http://my-tempo-distributor.tempo.svc:4317"
         tls:
           insecure: true
 
       prometheusremotewrite/mimir:
-        endpoint: "http://mimir-app-dmor-distributor.mimir.svc:8080/api/v1/push"
+        endpoint: "http://my-mimir-distributor.mimir.svc:8080/api/v1/push"
         headers:
           X-Scope-OrgID: "anonymous"
 
       loki:
-        endpoint: "http://loki-app-dmor-loki-distributed-distributor.loki.svc:3100/loki/api/v1/push"
+        endpoint: "http://my-loki-loki-distributed-distributor.loki.svc:3100/loki/api/v1/push"
 
     extensions:
       zpages:

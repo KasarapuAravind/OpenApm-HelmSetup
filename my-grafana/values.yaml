@@ -27,11 +27,11 @@ grafana:
 
   resources:
     limits:
-      cpu: 50m
-      memory: 100Mi
+      cpu: 100m
+      memory: 200Mi
     requests:
-      cpu: 50m
-      memory: 100Mi
+      cpu: 100m
+      memory: 200Mi
 
   # TODO: Temporary, hard-code admin to match kube-prometheus-stack values
   adminUser: admin
@@ -42,11 +42,11 @@ grafana:
   sidecar:
     resources:
       limits:
-        cpu: 50m
-        memory: 100Mi
+        cpu: 100m
+        memory: 200Mi
       requests:
-        cpu: 50m
-        memory: 100Mi
+        cpu: 100m
+        memory: 200Mi
 
 
     # These are the resources that are watched for dynamic updates
