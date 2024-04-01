@@ -1,0 +1,28 @@
+{{- with .Values.monitoring.dashboards }}
+{{- if .enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "loki.dashboardsName" $ }}-3
+  namespace: {{ .namespace | default $.Release.Namespace }}
+  labels:
+    {{- include "loki.labels" $ | nindent 4 }}
+    {{- with .labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    grafana_folder: "APM Tools Compiled"
+data:
+  "loki-reads-resources.json": |
+    {{ $.Files.Get "src/dashboards-compiled/loki-reads-resources.json" | fromJson | toJson }}
+  "loki-reads.json": |
+    {{ $.Files.Get "src/dashboards-compiled/loki-reads.json" | fromJson | toJson }}
+  "loki-retention.json": |
+    {{ $.Files.Get "src/dashboards-compiled/loki-retention.json" | fromJson | toJson }}
+  "loki-writes-resources.json": |
+    {{ $.Files.Get "src/dashboards-compiled/loki-writes-resources.json" | fromJson | toJson }}
+  "loki-writes.json": |
+    {{ $.Files.Get "src/dashboards-compiled/loki-writes.json" | fromJson | toJson }}
+{{- end -}}
+{{- end -}}
