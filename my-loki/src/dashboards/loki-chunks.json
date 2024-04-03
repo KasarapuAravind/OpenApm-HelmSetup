@@ -58,7 +58,7 @@
                 "steppedLine": false,
                 "targets": [
                    {
-                      "expr": "sum(loki_ingester_memory_chunks{cluster=\"$cluster\", job=~\"$namespace/(loki|enterprise-logs)-write\"})",
+                      "expr": "sum(loki_ingester_memory_chunks{cluster=\"$cluster\", job=~\".*ingester.*\"})",
                       "format": "time_series",
                       "intervalFactor": 2,
                       "legendFormat": "series",
@@ -134,7 +134,7 @@
                 "steppedLine": false,
                 "targets": [
                    {
-                      "expr": "sum(loki_ingester_memory_chunks{cluster=\"$cluster\", job=~\"$namespace/(loki|enterprise-logs)-write\"}) / sum(loki_ingester_memory_streams{cluster=\"$cluster\", job=~\"$namespace/(loki|enterprise-logs)-write\"})",
+                      "expr": "sum(loki_ingester_memory_chunks{cluster=\"$cluster\", job=~\".*ingester.*\"}) / sum(loki_ingester_memory_streams{cluster=\"$cluster\", job=~\".*ingester.*\"})",
                       "format": "time_series",
                       "intervalFactor": 2,
                       "legendFormat": "chunks",
@@ -238,7 +238,7 @@
                       "step": 10
                    },
                    {
-                      "expr": "sum(rate(loki_ingester_chunk_utilization_sum{cluster=\"$cluster\", job=~\"$namespace/(loki|enterprise-logs)-write\"}[$__rate_interval])) * 1 / sum(rate(loki_ingester_chunk_utilization_count{cluster=\"$cluster\", job=~\"$namespace/(loki|enterprise-logs)-write\"}[$__rate_interval]))",
+                      "expr": "sum(rate(loki_ingester_chunk_utilization_sum{cluster=\"$cluster\", job=~\".*ingester.*\"}[$__rate_interval])) * 1 / sum(rate(loki_ingester_chunk_utilization_count{cluster=\"$cluster\", job=~\".*ingester.*\"}[$__rate_interval]))",
                       "format": "time_series",
                       "intervalFactor": 2,
                       "legendFormat": "Average",
@@ -330,7 +330,7 @@
                       "step": 10
                    },
                    {
-                      "expr": "sum(rate(loki_ingester_chunk_age_seconds_sum{cluster=\"$cluster\", job=~\"$namespace/(loki|enterprise-logs)-write\"}[$__rate_interval])) * 1e3 / sum(rate(loki_ingester_chunk_age_seconds_count{cluster=\"$cluster\", job=~\"$namespace/(loki|enterprise-logs)-write\"}[$__rate_interval]))",
+                      "expr": "sum(rate(loki_ingester_chunk_age_seconds_sum{cluster=\"$cluster\", job=~\".*ingester.*\"}[$__rate_interval])) * 1e3 / sum(rate(loki_ingester_chunk_age_seconds_count{cluster=\"$cluster\", job=~\".*ingester.*\"}[$__rate_interval]))",
                       "format": "time_series",
                       "intervalFactor": 2,
                       "legendFormat": "Average",
@@ -434,7 +434,7 @@
                       "step": 10
                    },
                    {
-                      "expr": "sum(rate(loki_ingester_chunk_entries_sum{cluster=\"$cluster\", job=~\"$namespace/(loki|enterprise-logs)-write\"}[$__rate_interval])) * 1 / sum(rate(loki_ingester_chunk_entries_count{cluster=\"$cluster\", job=~\"$namespace/(loki|enterprise-logs)-write\"}[$__rate_interval]))",
+                      "expr": "sum(rate(loki_ingester_chunk_entries_sum{cluster=\"$cluster\", job=~\".*ingester.*\"}[$__rate_interval])) * 1 / sum(rate(loki_ingester_chunk_entries_count{cluster=\"$cluster\", job=~\".*ingester.*\"}[$__rate_interval]))",
                       "format": "time_series",
                       "intervalFactor": 2,
                       "legendFormat": "Average",
@@ -510,7 +510,7 @@
                 "steppedLine": false,
                 "targets": [
                    {
-                      "expr": "sum(rate(loki_chunk_store_index_entries_per_chunk_sum{cluster=\"$cluster\", job=~\"$namespace/(loki|enterprise-logs)-write\"}[5m])) / sum(rate(loki_chunk_store_index_entries_per_chunk_count{cluster=\"$cluster\", job=~\"$namespace/(loki|enterprise-logs)-write\"}[5m]))",
+                      "expr": "sum(rate(loki_chunk_store_index_entries_per_chunk_sum{cluster=\"$cluster\", job=~\".*ingester.*\"}[5m])) / sum(rate(loki_chunk_store_index_entries_per_chunk_count{cluster=\"$cluster\", job=~\".*ingester.*\"}[5m]))",
                       "format": "time_series",
                       "intervalFactor": 2,
                       "legendFormat": "Index Entries",
@@ -682,7 +682,7 @@
                 "steppedLine": false,
                 "targets": [
                    {
-                      "expr": "sum by (status) (\n  label_replace(label_replace(rate(loki_ingester_chunk_age_seconds_count{cluster=\"$cluster\", job=~\"$namespace/(loki|enterprise-logs)-write\"}[$__rate_interval]),\n  \"status\", \"${1}xx\", \"status_code\", \"([0-9])..\"),\n  \"status\", \"${1}\", \"status_code\", \"([a-z]+)\"))\n",
+                      "expr": "sum by (status) (\n  label_replace(label_replace(rate(loki_ingester_chunk_age_seconds_count{cluster=\"$cluster\", job=~\".*ingester.*\"}[$__rate_interval]),\n  \"status\", \"${1}xx\", \"status_code\", \"([0-9])..\"),\n  \"status\", \"${1}\", \"status_code\", \"([a-z]+)\"))\n",
                       "format": "time_series",
                       "intervalFactor": 2,
                       "legendFormat": "{{status}}",
@@ -770,7 +770,7 @@
                 "steppedLine": false,
                 "targets": [
                    {
-                      "expr": "sum(rate(loki_ingester_chunks_flushed_total{cluster=\"$cluster\", job=~\"$namespace/(loki|enterprise-logs)-write\"}[$__rate_interval]))",
+                      "expr": "sum(rate(loki_ingester_chunks_flushed_total{cluster=\"$cluster\", job=~\".*ingester.*\"}[$__rate_interval]))",
                       "format": "time_series",
                       "intervalFactor": 2,
                       "legendFormat": "{{pod}}",
@@ -846,7 +846,7 @@
                 "steppedLine": false,
                 "targets": [
                    {
-                      "expr": "sum by (reason) (rate(loki_ingester_chunks_flushed_total{cluster=\"$cluster\", job=~\"$namespace/(loki|enterprise-logs)-write\"}[$__rate_interval])) / ignoring(reason) group_left sum(rate(loki_ingester_chunks_flushed_total{cluster=\"$cluster\", job=~\"$namespace/(loki|enterprise-logs)-write\"}[$__rate_interval]))",
+                      "expr": "sum by (reason) (rate(loki_ingester_chunks_flushed_total{cluster=\"$cluster\", job=~\".*ingester.*\"}[$__rate_interval])) / ignoring(reason) group_left sum(rate(loki_ingester_chunks_flushed_total{cluster=\"$cluster\", job=~\".*ingester.*\"}[$__rate_interval]))",
                       "format": "time_series",
                       "intervalFactor": 2,
                       "legendFormat": "{{reason}}",
@@ -926,7 +926,7 @@
                 "span": 12,
                 "targets": [
                    {
-                      "expr": "sum by (le) (rate(loki_ingester_chunk_utilization_bucket{cluster=\"$cluster\", job=~\"$namespace/(loki|enterprise-logs)-write\"}[$__rate_interval]))",
+                      "expr": "sum by (le) (rate(loki_ingester_chunk_utilization_bucket{cluster=\"$cluster\", job=~\".*ingester.*\"}[$__rate_interval]))",
                       "format": "heatmap",
                       "intervalFactor": 2,
                       "legendFormat": "{{le}}",
@@ -988,7 +988,7 @@
                 "span": 12,
                 "targets": [
                    {
-                      "expr": "sum(rate(loki_ingester_chunk_size_bytes_bucket{cluster=\"$cluster\", job=~\"$namespace/(loki|enterprise-logs)-write\"}[$__rate_interval])) by (le)",
+                      "expr": "sum(rate(loki_ingester_chunk_size_bytes_bucket{cluster=\"$cluster\", job=~\".*ingester.*\"}[$__rate_interval])) by (le)",
                       "format": "heatmap",
                       "intervalFactor": 2,
                       "legendFormat": "{{le}}",
@@ -1178,7 +1178,7 @@
                       "step": 10
                    },
                    {
-                      "expr": "sum(rate(loki_ingester_chunk_bounds_hours_sum{cluster=\"$cluster\", job=~\"$namespace/(loki|enterprise-logs)-write\"}[5m])) / sum(rate(loki_ingester_chunk_bounds_hours_count{cluster=\"$cluster\", job=~\"$namespace/(loki|enterprise-logs)-write\"}[5m]))",
+                      "expr": "sum(rate(loki_ingester_chunk_bounds_hours_sum{cluster=\"$cluster\", job=~\".*ingester.*\"}[5m])) / sum(rate(loki_ingester_chunk_bounds_hours_count{cluster=\"$cluster\", job=~\".*ingester.*\"}[5m]))",
                       "format": "time_series",
                       "intervalFactor": 2,
                       "legendFormat": "avg",
