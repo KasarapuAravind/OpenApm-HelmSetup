@@ -1,0 +1,233 @@
+# https://github.com/grafana/helm-charts/blob/main/charts/tempo-distributed/values.yaml
+
+# Global vars for all environments
+
+commonannotations: &commonAnnotations
+  nice.com/owner: aravind
+  nice.com/product: openapm
+
+
+# Used to control population of various monitoring dashboards
+monitoring:
+  dashboards:
+    enabled: true
+
+tempo-distributed:
+
+  # Disable usage reporting
+  reporting_enabled: false
+
+  # Enable Prometheus metrics
+  metaMonitoring:
+    serviceMonitor:
+      enabled: true
+
+  traces:
+    otlp:
+      grpc:
+        enabled: true
+
+  prometheusRule:
+    enabled: true
+
+  # The metrics generator will automatically calculate metrics from
+  # the distributed traces
+  #
+  # It comes at an extra data transfer and compute cost.  Incoming
+  # traces will be sent to the metrics generator in addition to
+  # the standard pathway
+  metricsGenerator:
+    enabled: true
+    annotations: *commonAnnotations
+    service:
+      annotations: *commonAnnotations
+    
+
+    replicas: 2   # required to get PDB generation
+    # Note there is a per-env config block for this service
+    resources:
+      limits:
+        cpu:  50m
+        memory: 100Mi
+      requests:
+        cpu:  50m
+        memory: 100Mi
+
+  compactor:
+    annotations: *commonAnnotations
+
+    service:
+      annotations: *commonAnnotations
+
+   
+
+    # Only have two replicas so we can get PDBs created
+    replicas: 2
+    resources:
+      limits:
+        cpu:  50m
+        memory: 100Mi
+      requests:
+        cpu:  50m
+        memory: 100Mi
+
+  distributor:
+    annotations: *commonAnnotations
+
+    service:
+      annotations: *commonAnnotations
+
+    serviceDiscovery:
+      annotations: *commonAnnotations
+
+    
+    # Replicas doesn't impact the spec output if autoScaling is enabled,
+    # but it is required to be >1 in order for a PDB to be created
+    replicas: 2
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 5
+
+    resources:
+      limits:
+        cpu:  50m
+        memory: 100Mi
+      requests:
+        cpu:  50m
+        memory: 100Mi
+
+  gateway:
+    enabled: false
+    service:
+      annotations: *commonAnnotations
+
+  
+
+    # Replicas doesn't impact the spec output if autoScaling is enabled,
+    # but it is required to be >1 in order for a PDB to be created
+    replicas: 2
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 3
+
+    resources:
+      limits:
+        cpu:  50m
+        memory: 100Mi
+      requests:
+        cpu:  50m
+        memory: 100Mi
+
+  ingester:
+    annotations: *commonAnnotations
+    podAnnotations: *commonAnnotations
+    service:
+      annotations: *commonAnnotations
+
+
+    # Min of 2 for data to ingest, N-1 means min of 3
+    replicas: 2
+
+    # Autoscaling of ingester can lead to data loss and instability in the cluster
+    autoscaling:
+      enabled: false
+
+    
+
+    resources:
+      limits:
+        cpu:  50m
+        memory: 100Mi
+      requests:
+        cpu:  50m
+        memory: 100Mi
+
+  # Revisited this section.  updated the right image tag to pull.
+  memcached:
+    enabled: true
+    image:
+      tag: 1.6.12-alpine3.15
+    podAnnotations: *commonAnnotations
+
+    service:
+      annotations: *commonAnnotations
+
+   
+    resources:
+      limits:
+        cpu:  50m
+        memory: 100Mi
+      requests:
+        cpu:  50m
+        memory: 100Mi
+
+  querier:
+    annotations: *commonAnnotations
+
+    service:
+      annotations: *commonAnnotations
+
+    
+
+    # Replicas doesn't impact the spec output if autoScaling is enabled,
+    # but it is required to be >1 in order for a PDB to be created
+    replicas: 2
+    autoscaling:
+      enabled: true
+      minReplicas: 1
+      maxReplicas: 3
+
+    resources:
+      limits:
+        cpu:  50m
+        memory: 100Mi
+      requests:
+        cpu:  50m
+        memory: 100Mi
+
+  queryFrontend:
+    annotations: *commonAnnotations
+
+    service:
+      annotations: *commonAnnotations
+    serviceDiscovery:
+      annotations: *commonAnnotations
+
+    
+
+    # Replicas doesn't impact the spec output if autoScaling is enabled,
+    # but it is required to be >1 in order for a PDB to be created
+    replicas: 2
+    autoscaling:
+      enabled: true
+      minReplicas: 1
+      maxReplicas: 3
+
+    resources:
+      limits:
+        cpu:  50m
+        memory: 100Mi
+      requests:
+        cpu:  50m
+        memory: 100Mi
+  tempo:
+    structuredConfig:
+      overrides:
+        metrics_generator_processors:
+          - service-graphs
+          - span-metrics
+        max_traces_per_user: 0
+      compactor:
+        compaction:
+          # 90 days. Config wants it in hours
+          block_retention: 168h
+      memberlist:
+        # https://github.com/grafana/mimir/issues/2865
+        cluster_label: "tempo"
+
+    podAnnotations: *commonAnnotations
+
+bmcAlertlabel:
+  platform: BMCQA

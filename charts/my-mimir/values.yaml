@@ -1,0 +1,84 @@
+# https://github.com/grafana/mimir/blob/main/operations/helm/charts/mimir-distributed/values.yaml
+# CHANGELOG for Mimir releases: https://github.com/grafana/mimir/blob/main/operations/helm/charts/mimir-distributed/CHANGELOG.md
+
+# Global vars for all environments
+
+commonAnnotations: &commonAnnotations
+  nice.com/owner: aravind
+  nice.com/product: openapm
+
+mimir-distributed:
+  global:
+    # Ensure we have our required annotations
+    podAnnotations: *commonAnnotations
+
+  metaMonitoring:
+    dashboards:
+      enabled: false
+      annotations:
+        grafana_folder: "APM Tools"
+
+    serviceMonitor:
+      enabled: true
+      labels:
+        servicemonitor_pointer: "prometheus"
+    prometheusRule:
+      enabled: true
+      mimirAlerts: true
+      mimirRules: true
+    
+
+  # Below are settings for the various services
+
+  alertmanager:
+    service:
+      annotations: *commonAnnotations
+    
+
+  compactor:
+    service:
+      annotations: *commonAnnotations
+    
+
+  distributor:
+    service:
+      annotations: *commonAnnotations
+
+  ingester:
+    service:
+      annotations: *commonAnnotations
+
+  overrides_exporter:
+    enabled: false
+    service:
+      annotations: *commonAnnotations
+    
+  querier:
+    replicas: 1
+    service:
+      annotations: *commonAnnotations
+    
+  query_frontend:
+    service:
+      annotations: *commonAnnotations
+    
+
+  query_scheduler:
+    replicas: 1
+    service:
+      annotations: *commonAnnotations
+    
+
+  # This is not deploying correct - if we want to use it, will
+  # have to make further updates
+  rollout_operator:
+    enabled: false
+
+  ruler:
+    service:
+      annotations: *commonAnnotations
+
+  store_gateway:
+    service:
+      annotations: *commonAnnotations
+    replicas: 1

@@ -1,0 +1,12 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  annotations:
+    owner: aravind.smsk@gmail.com
+    product: kube-prometheus-stack
+  name: kube-pr-operator
+spec:
+  minAvailable: 0
+  selector:
+    matchLabels:
+      app: kube-prometheus-stack-operator

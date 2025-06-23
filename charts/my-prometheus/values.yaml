@@ -1,0 +1,189 @@
+# Default values for kube-prometheus-stack.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
+
+
+# If `commonAnnotations` is set outside of this file then you must also set all other values which reference the `*commonAnnotations` anchor
+commonAnnotations: &commonAnnotations
+  nice.com/owner: aravind
+  nice.com/product: openapm
+
+kube-prometheus-stack:
+  prometheusOperator:
+    resources:
+      limits:
+        cpu: 100m
+        memory: 200Mi
+      requests:
+        cpu: 15m
+        memory: 110Mi
+
+    prometheusConfigReloader:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 50Mi
+        limits:
+          cpu: 50m
+          memory: 50Mi
+
+    annotations: *commonAnnotations
+    podAnnotations: *commonAnnotations
+    admissionWebhooks:
+      deployment:
+        annotations: *commonAnnotations
+        podAnnotations: *commonAnnotations
+        service:
+          annotations: *commonAnnotations
+        podDisruptionBudget:
+          maxUnavailable: 1
+      patch:
+        annotations: *commonAnnotations
+        podAnnotations: *commonAnnotations
+        resources:
+          limits:
+            cpu: 100m
+            memory: 200Mi
+          requests:
+            cpu: 15m
+            memory: 110Mi
+    service:
+      annotations: *commonAnnotations
+  alertmanager:
+    enabled: false
+  coreDns:
+    service:
+      selector:
+        k8s-app: kube-dns
+  defaultRules:
+    rules:
+      alertmanager: false
+      etcd: false
+      kubeScheduler: false
+    additionalRuleLabels:
+      # Use the dynamic namespace value so that alerts are delivered to the owner of the namespace where the problematic condition is occurring
+      # TODO: it would be nice to support sending notifications to xMatters
+      platforms: "Teams_{{ $labels.namespace }}"
+  grafana:
+    enabled: false
+  kubeControllerManager:
+    enabled: false
+  kubeEtcd:
+    enabled: false
+  kubeProxy:
+    enabled: false
+  kubeScheduler:
+    enabled: false
+  kube-state-metrics:
+    resources:
+      limits:
+        cpu: 100m
+        memory: 200Mi
+      requests:
+        cpu: 15m
+        memory: 110Mi
+    podAnnotations: *commonAnnotations
+    service:
+      annotations: *commonAnnotations
+    podDisruptionBudget:
+      maxUnavailable: 1
+
+  prometheus-node-exporter:
+    resources:
+      limits:
+        cpu: 50m
+        memory: 200Mi
+      requests:
+        cpu: 15m
+        memory: 110Mi
+    podAnnotations: *commonAnnotations
+    service:
+      annotations: *commonAnnotations
+  prometheus:
+    podDisruptionBudget:
+      enabled: true
+      minAvailable: 1
+    annotations: *commonAnnotations
+    service:
+      annotations: *commonAnnotations
+    servicePerReplica:
+      annotations: *commonAnnotations
+      resources:
+        limits:
+          cpu: 200m
+          memory: 400Mi
+        requests:
+          cpu: 100m
+          memory: 200Mi
+      additionalPrometheusSecretsAnnotations: *commonAnnotations
+      podMetadata:
+        annotations: *commonAnnotations
+      podMonitorSelector: {}
+      podMonitorSelectorNilUsesHelmValues: false
+      replicas: 2
+      retention: 30d
+      # if true, nil, {} select default values given in helm, values=prom-app-dmor
+      # if false Helm will ignore its default value for ruleMonitorSelector. This allows you to have more control over the ruleMonitorSelector field and specify your own custom selector in values.yaml,
+      ruleSelectorNilUsesHelmValues: false
+      # only supports matchLabels & matchExpressions
+      # to enable auto-discovery of alert rules of only OpenAPM core components (loki, tempo, mimir, otel-collector, prometheus)
+      # if {}, select all rules
+      ruleNamespaceSelector:
+        matchExpressions:
+          - key: name
+            operator: In
+            values:
+              - loki
+              - tempo
+              - mimir
+              - otel-collector
+              - prometheus
+              - grafana
+              - mon-sre-monitoring
+      # If {}, select all rules
+      ruleSelector:
+      # if true, nil, {} select default values given in helm, values=prom-app-dmor
+      # if false Helm will ignore its default value for serviceMonitorSelector. This allows you to have more control over the serviceMonitorSelector field and specify your own custom selector in values.yaml,
+      serviceMonitorSelectorNilUsesHelmValues: false
+      # only supports matchLabels & matchExpressions
+      # to enable auto-discovery of service monitors of only OpenAPM core components (loki, tempo, mimir, otel-collector, prometheus)
+      serviceMonitorNamespaceSelector:
+        matchExpressions:
+          - key: name
+            operator: In
+            values:
+              - loki
+              - tempo
+              - mimir
+              - otel-collector
+              - prometheus
+              - grafana
+              - karpenter
+      # If {}, select all ServiceMonitors
+      serviceMonitorSelector:
+        # matchLabels:
+        #   servicemonitor_pointer: prometheus
+
+podDisruptionBudget:
+  kubeOperator:
+    name: kube-pr-operator
+    minAvailable: 0
+    selector:
+      matchLabels:
+        app: kube-prometheus-stack-operator
+  stateMetrics:
+    name: kube-state-metrics
+    minAvailable: 0
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: kube-state-metrics
+  grafana:
+    minAvailable: 0
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: grafana
+
+# annotations to be added to all provisioned resources
+annotations: *commonAnnotations

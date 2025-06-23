@@ -1,0 +1,197 @@
+# https://github.com/grafana/helm-charts/blob/main/charts/loki-distributed/values.yaml
+#
+# Good example article: https://www.mdotyeducation.com/configure-loki-storage/
+
+
+# Anchors
+
+# These vars are only utilized by local chart templates
+monitoring:
+  dashboards:
+    enabled: true
+    labels:
+      grafana_dashboard: "1"
+    annotations:
+      grafana_folder: "APM Tools"
+
+loki:
+  monitoring:
+    serviceMonitor:
+      enabled: true
+      labels:
+        servicemonitor_pointer: "prometheus"
+    prometheusRule:
+      enabled: true
+
+
+  loki:
+    annotations:
+      nice.com/owner: aravind
+      nice.com/product: openapm
+    serviceAnnotations:
+      nice.com/owner: aravind
+      nice.com/product: openapm
+    podAnnotations:
+      nice.com/owner: aravind
+      nice.com/product: openapm
+
+
+
+  deploymentMode: Distributed
+  backend:
+    replicas: 0
+  read:
+    replicas: 0
+  write:
+    replicas: 0
+  singleBinary:
+    replicas: 0
+
+  compactor:
+    enabled: true
+    resources:
+      limits:
+        cpu: 50m
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        memory: 100Mi
+
+  distributor:
+    # Replicas doesn't impact the spec output if autoScaling is enabled,
+    # but it is required to be >1 in order for a PDB to be created
+    replicas: 2
+    maxUnavailable: 1
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 4
+      targetCPUUtilizationPercentage: 80
+    resources:
+      limits:
+        cpu: 50m
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        memory: 100Mi
+    
+  ingester:
+    replicas: 2
+    maxUnavailable: 1
+    # Autoscaling ingester pods proved unreliable so we are going with fixed pod count
+    autoscaling:
+      enabled: false
+    resources:
+      limits:
+        cpu: 50m
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        memory: 100Mi
+
+    
+  querier:
+    # Replicas doesn't impact the spec output if autoScaling is enabled,
+    # but it is required to be >1 in order for a PDB to be created
+    replicas: 2
+    maxUnavailable: 1
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 4
+    resources:
+      limits:
+        cpu: 50m
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        memory: 100Mi
+   
+
+  queryScheduler:
+    replicas: 2
+    maxUnavailable: 1
+    resources:
+      limits:
+        cpu: 50m
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        memory: 100Mi
+    
+
+  queryFrontend:
+    # Replicas doesn't impact the spec output if autoScaling is enabled,
+    # but it is required to be >1 in order for a PDB to be created
+    replicas: 2
+    maxUnavailable: 1
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 4
+    resources:
+      limits:
+        cpu: 50m
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        memory: 100Mi
+ 
+  indexGateway:
+    replicas: 2
+    maxUnavailable: 1
+    resources:
+      limits:
+        cpu: 50m
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        memory: 100Mi
+    serviceAnnotations:
+      nice.com/owner: aravind
+      nice.com/product: openapm
+   
+
+  gateway:
+    image:
+      tag: 1.27-alpine
+      pullPolicy: Always
+    enabled: true
+    replicas: 2
+    maxUnavailable: 1
+    autoscaling:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 4
+
+    resources:
+      limits:
+        cpu: 50m
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        memory: 100Mi
+
+    service:
+      annotations:
+        nice.com/owner: aravind
+        nice.com/product: openapm
+
+
+  # This is an example of a ruler definition that looks for high percentages of error messages
+  # In our test app, can use the following: sum(rate({service_name="SampleTestApp"} |= `Critical` [$__interval])) / sum(rate({service_name="SampleTestApp"} [$__interval]))
+  ruler:
+    # Replicas doesn't impact the spec output if autoScaling is enabled,
+    # but it is required to be >1 in order for a PDB to be created
+    enabled: true
+
+    replicas: 2
+    maxUnavailable: 1
+
+    resources:
+      limits:
+        cpu: 50m
+        memory: 100Mi
+      requests:
+        cpu: 50m
+        memory: 100Mi
